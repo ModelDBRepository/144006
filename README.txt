@@ -1,0 +1,672 @@
+*****************************************
+Grid cell spatial pattern models
+  eric zilli 
+*****************************************
+
+Version 1.007.
+
+This package contains MATLAB implementations of grid cell models drawn
+from the literature in the years 2005 to 2011.
+
+This package does not yet have *all* models that can produce the
+grid pattern. Right now these are missing and here's why:
+* Welday et al. 2011 just came out. It is essentially the Blair et al. 2008
+    model, though they used a cool approach of writing the activity in terms
+    of the interference envelope, but BlairEtAl2008.m suffices to test it
+    for now. More importantly, they were great enough to share their code
+    on ModelDB http://senselab.med.yale.edu/modeldb/ShowModel.asp?model=129067
+    Someone buy them a beer.
+* O'Keefe and Burgess 2005 and McNaughton et al. 2006 talked about
+    models but didn't give enough details as to describe a unique model to
+    implement.
+* XXXX in print and XXXX in review. I'm aware of 2 developmental models
+    but cannot describe articles not yet published. I'm intending to name
+    the paper in a manner to suggest it covers only models published
+    through 2011 so if these are published past December technically I don't
+    have to implement them! I probably will, though. I'm a loner, Dottie.
+    A rebel.
+* Zhang 1996, Samsonovich and McNaughton 1997, Conklin and Eliasmith 2005
+    to name three, are older place cell models, but two have toroidal
+    topologies (and Zhang 1996 mentioned it) and so produce rectangular
+    grids. Technically observed entorhinal grids are almost always
+    hexagonal, but O'Keefe and Burgess 2005 was a rectangular grid
+    model, for instance, and I still mention that one. At the very least
+    Zhang 1996's ring model is worth implementing for its comprehensive
+    theoretical approach and Conklin and Eliasmith 2005 because I've
+    long wanted to better understand their framework for deriving
+    attractor networks analytically.
+* Amari 1977 considered a neural field (a continuous attractor network type
+    system) in which multi-peaked solutions could occur. This was not quite a
+    grid cell model, but a link was pointed out by Spencer et al. "The Dynamic
+    Field Theory and Embodied Cognitive Dynamics"   
+    (http://homepage.psy.utexas.edu/homepage/group/loveLAB/love/classes/models/SC.pdf),
+    footnote 3. Verily I quoth,
+      "3. One of the attractor states Amari identified was a [...] spatially
+      periodic state, where the period varies with the average stimulation to
+      the field. We suspect this state is involved in extracting the axes of
+      symmetry we have probed in our work on the development of spatial recall
+      (see, e.g., Schutte, Spencer, & Schöner, 2003). This state might also have
+      ties to the pattern of “grid” cells observed in entorhinal and perirhinal
+      cortex (Hafting, Fyhn, Molden, Moser, & Moser, 2005)."
+
+
+*****************************************
+* Version history
+*****************************************
+
+The newest version of this package can be found at
+http://people.bu.edu/zilli/gridmodels.html or by emailing
+me should that page disappear. I'm not a huge fan of ModelDB,
+but I might throw a backup up there too just in case.
+
+v1.007 20120127
+  Removed a comment in Guanella et al. 2007 that incorrectly said
+    normalization was not needed in the model.
+
+v1.006 20120113
+  Cleaning up README.txt a little.
+
+v1.005 20111230
+  Cleaning up README.txt a little.
+
+v1.004. 20111214
+  Added model FuhsTouretzky2006_development.m
+
+v1.003. 20111214
+  Downsampled data in ZilliHasselmo2010_voltage_traces.mat
+    used for FigureMaintain.m for smaller package size.
+  Fixed a bug in BurgessEtAl2007.m, Burgess2008_bat.m,
+    GiocomoEtAl2007.m, Hasselmo2008_bat.m, NavratilovaEtAl2011.m,
+    and ZilliHasselmo2010.m where spikes were being drawn slightly
+    offset from the trajectory.
+  Cleaned out some old comments in FigureMaintain.m
+
+v1.002. 20111213
+  Added model KropffTreves2008.m
+
+v1.001. 20111211.
+  Added model GiocomoEtAl2007.m
+  Added model ZilliHasselmo2010.m
+  Added data file simple_model_RS2_FI_Jan09_n1.mat
+  Added data file simple_model_RS2sn_FI_Jan09_n250.mat
+
+v1.0. 20111208.
+  First public release.
+
+
+*****************************************
+* Errata
+*****************************************
+
+None yet.
+
+
+*****************************************
+* Scripts that generate Figures
+*****************************************
+
+These figures may be useful when talking about the models.
+
+The figure scripts are pretty messy. The figures are all drawn
+directly in MATLAB and that involves drawing a lot of rectangles
+and lines, plotting data, drawing text, and manipulating axis
+properties. Use MATLAB's cell titles feature if you have a recent
+version to more easily navigate these files (the little button in
+the editor with two percentage signs and a down arrow).
+
+The figures generated by these scripts were saved as a .pdf
+using the great script export_fig from MATLAB Central which gives
+very pretty output files. The figures use Arial, but MATLAB
+cannot produce output with Arial, so Illustrator 
+can be used to convert the fonts (use Type->Find Font... to quickly
+replace the fonts). The resulting output is slightly uglier than
+the original pdf.
+
+*** Figure_AttractorWeights.m
+ This generates Figure 3, which demonstrates the functioning of three CAN
+models. The data plotted was generated using the scripts
+FuhsTouretzky2006.m, GaussierEtAl2007.m, and BurakFiete2009.m. Commented
+out code at the beginning of these scripts will calculate and save the
+files necessary to plot Figure 3.
+(This data is included pre-generated in the files Fu06_WeightFigure_vars.mat,
+Gu07_WeightFigure_vars.mat, and Bu09_WeightFigure_vars.mat)
+
+*** Figure_BatGrid.m
+ This generates a figure not included in the manuscript. The figure was
+designed to demonstrate how different interference models are in fact
+consistent with the bat grid cell data reported by Yartsev et al. 2011.
+This script calls _bat.m variations on three models, BurgessEtAl2007_bat.m,
+Burgess2008_bat.m, and Hasselmo2008_bat.m. Generally these scripts
+change two things about the model: the baseline frequency is set to 0 Hz
+and oscillators are modified so that their frequency only increases in
+response to velocity input.
+
+*** Figure_Grid.m
+ This generates Figure 1, which demonstrates various conceptualizations
+of the hexagonal grid pattern.
+
+*** Figure_Maintain.m
+ This generates Figure 2, which demonstrates various ways that the different
+models encode linear and planar positions.
+(Uses files generalGridPattern.mat, Fu06_WeightFigure_vars.mat,
+Gu07_WeightFigure_vars.mat, and Bu09_WeightFigure_vars.mat)
+
+*** Figure_Readout.m
+ This generates Figure 4, which demonstrates the read-out rules that have
+been used in the temporal interference models.
+ 
+*** drawSimpleRing.m
+ This function is used to draw simple ring attractors to the current axes.
+It accepts parameters specifying how many nested rings of cells to draw,
+how many cells (drawn as circles) in each ring, how large the cells should
+be drawn, which cell should be drawn as active, what colors to draw each
+cell, and whether or not to draw an arrow around the ring indicating
+the motion of a biased ring attractor. It's a bit messy and poorly written,
+but might be useful to others (at least as a starting point).
+
+
+*****************************************
+* Model scripts
+*****************************************
+
+The names are pretty self-explanatory so I'll only describe the variations.
+More details are available in the original manuscripts (see references
+below), the scripts themselves, and my manuscript.
+
+*** BlairEtAl2007.m
+
+*** BlairEtAl2008.m
+
+*** BlairEtAl2008_2D.m
+  This is a 2D version of their 1D model.
+
+*** BurakFiete2009.m
+
+*** Burgess2008.m
+
+*** Burgess2008_bat.m
+  This is a version of the model configured to be consistent
+  with the Yartsev et al. 2011 bat data. It accepts command
+  line options so that FigureBatGrid.m can pull out the
+  data it needs.
+
+*** BurgessEtAl2007.m
+
+*** BurgessEtAl2007_bat.m
+  This is a version of the model configured to be consistent
+  with the Yartsev et al. 2011 bat data. It accepts command
+  line options so that FigureBatGrid.m can pull out the
+  data it needs.
+
+*** BurgessEtAl2007_precession.m
+  This implements my guesses as to what Burgess meant in his
+  precession discussion
+
+*** FuhsTouretzky2006.m
+
+*** FuhsTouretzky2006_development.m
+  This implements Fuhs and Touretzky (2006)'s developmental method
+  for learning the symmetric component of their weight matrix using
+  sinusoidal gratings of activity analogous to retinal waves.
+
+*** GaussierEtAl2007.m
+
+*** GuanellaEtAl2007.m
+
+*** GuanellaEtAl2007_no_twist.m
+  This demonstrates how a single-bump torus can produce hexagonal
+  fields by skewing the input velocities.
+
+*** Hasselmo2008.m
+
+*** Hasselmo2008_bat.m
+  This is a version of the model configured to be consistent
+  with the Yartsev et al. 2011 bat data. It accepts command
+  line options so that FigureBatGrid.m can pull out the
+  data it needs.
+
+*** HasselmoBrandon2008.m
+
+*** MhatreEtAl2010.m
+
+*** NavratilovaEtAl2011.m
+
+*** ZilliHasselmo2010.m
+
+
+*****************************************
+* Data files
+*****************************************
+
+To plot some of the figures, data generated in simulations is required.
+The following data files are included.
+
+*** 11207-21060501+02_t6c1.mat
+ This contains rat trajectory from Sargolini et al. 2006. It is used
+as the input to the Mhatre et al. 2010 model.
+
+*** BlairEtAl2007_Readout.mat
+ This contains a variable of their moire interference mechanism as seen
+in my Figure 1.
+
+*** Bu09_WeightFigure_vars.mat
+ This contains network activity and synaptic input variables used in
+Figures 2 and 3.
+
+*** Fu06_WeightFigure_vars.mat
+ This contains network activity and synaptic input variables used in
+Figures 2 and 3.
+
+*** generalGridPattern.mat
+ This contains a variable that is an image of hexagonally arrayed
+fields to show how the idealized hexagonal grid pattern looks. It
+was generated by summing three 2D cosine gratings a la Blair et al.
+(2007). Used in Figures 1 and 2.
+
+*** Gu07_WeightFigure_vars.mat
+ This contains network activity and synaptic input variables used in
+Figures 2 and 3.
+
+*** HaftingTraj_centimeters_seconds.mat
+ This contains trajectory from Hafting et al. 2005 of a rat running
+around an open field for about 591 seconds (a tad under 10 minutes).
+
+*** simple_model_RS2_FI_Jan09_n1.mat
+ This contains an FI curve (generated by SI_simple_model_FI_relation.m
+ in the Zilli and Hasselmo scripts on ModelDB) of a type 2 excitable
+ regular spiking simple model neuron for use in ZilliHasselmo2010.m.
+
+*** simple_model_RS2sn_FI_Jan09_n250.mat
+ This contains an FI curve (generated by SI_simple_model_FI_relation.m
+ in the Zilli and Hasselmo scripts on ModelDB) of a network of 250 
+ all-to-all connected type 2 excitable regular spiking simple model
+ neurons connected with delta synapses and injected with a realistic
+ level of noise for use in ZilliHasselmo2010.m.
+
+*** Spatial_interference.mat
+ This contains an image of two sets of spatial bands at a 60 degree
+angle overlapping to produce a hexagonal pattern. Used in Figure 1.
+
+*** ZilliHasselmo2010_voltage_traces.mat
+ This contains voltage traces of VCOs from the Zilli and Hasselmo
+model to show phase-synchronized spiking. Used in Figure 2.
+
+
+*****************************************
+* Model speeds
+*****************************************
+
+The simulations of the models vary greatly in speed, i.e. how long you have
+to sit there waiting for something interesting to happen. The simulations
+were not thoroughly optimized for speed, so a bit of improvement is
+possible in some models, but overall these times do fairly represent the
+complexity of the various models. (Note that, e.g. MhatreEtAl2010.m runs
+fairly quickly on a per-run basis, but it is a developmental so many runs
+are required, making it slower than other models where much shorter
+simulations suffice to show that the models are working)
+
+Simulation speeds (with graphics disabled, i.e. livePlot=0):
+* Instant:
+  *** BlairEtAl2007.m - All we have to do is make two theta grids and add
+          them together.
+  *** BlairEtAl2008.m - I wrote this one fully vectorized so it is very
+          fast. Hasselmo2008.m, probably GaussierEtAl2007.m, and the
+          Burgess models could also be easily vectorized in this manner
+          for faster simulations.
+
+* Fast:
+  *** HasselmoBrandon2008.m - (about 1 s to run 200 s of simulation)
+  *** Burgess2008.m - (about 2 s for a 200 s run)
+  *** BurgessEtAl2007.m - (about 2 s for a 200 s run)
+  *** Hasselmo2008.m - (about 6 s for a 200 s run, faster if
+          spikeTimes/spikeCoords/spikePhases were pre-alloc'd)
+
+* Medium:
+  *** GaussierEtAl2007.m - (about 20 s for a 200 s run)
+  *** GuanellaEtAl2007.m - (about 60 s for a 200 s run)
+
+* Slow:
+  *** ZilliHasselmo2010.m - (1 cell per oscillator; about 55 s for a 20 s run)
+  *** ZilliHasselmo2010.m - (250 cells per oscillator; about 100 s for a 20 s run)
+  *** FuhsTouretzky2006.m - (about 220 s for a 20 s run)
+  *** NavratilovaEtAl2011.m - (about 766 s for a 20 s run)
+
+* Ent-like:
+  *** BurakFiete2009.m - (about 170 s for a 1 s run, not counting the
+          hour or so to generate W)
+
+* Developmental (not fair to compare to the other models):
+  *** MhatreEtAl2010.m - (about 360 s for a 1200 s run but 5-20 are needed)
+  *** KropffTreves2008.m - (about 3560 s for a 500,000 step run)
+
+
+*****************************************
+* Irreleventia
+*****************************************
+
+To make this collection, I had to make a number of decisions about what
+constitutes a grid cell model and what constitutes implementing it.
+
+Modeling papers generally show how some mechanism can produce some
+apparently unrelated phenomenon, and presumably the authors also assume
+that any obvious variation on the mechanism is also described by their
+model, not uncommonly making explicit the variations they considered most
+interesting. This provides the first issue: if a paper describes many
+variations on a model, should only some or all be implemented? My bias was
+toward implementing the simpler versions, or more than one if many were
+easy to do.
+
+Many models contain not just one mechanism, but multiple interacting
+mechanisms that produce the phenomenon of interest. Not uncommonly,
+modelers do not model all the mechanisms, but rather assume some
+mechanisms work perfectly and calculate what they would be expected to do
+rather than specifying how it might be done. This simplifies research
+by saving programmers from redoing work that has already been done, but
+can be dangerous in that it is easy to assume impossible things. I have
+tried to follow the lead of the authors, generally implementing what they
+implemented and not implementing what they didn't. Be warned that the
+ability of any model to produce correct-looking output does not mean it
+is doing it in a sane or robust manner (even if it is published!).
+
+The points above apply to all modeling, but this review was focused on grid
+cells so I had to identify the grid cell models to review. I hope I found
+and discussed all of the substantive models directly addressing grid cells,
+but most grid cell models derive from earlier place cell models that
+produced a repeating grid of fields. Thus many place cell models were
+or contained grid cell models, even though grid cells were not known at the
+time (or were just being discovered, e.g. Conklin and Eliasmith 2005).
+
+*****************************************
+* Model references
+*****************************************
+
+These are the papers I know of containing grid cell models or place cell
+models that could produce grid cells. I'm happy to share pdfs of any or
+all if you can't access them.
+
+Blair, H. T., Gupta, K., & Zhang, K. (2008). Conversion of a phase- to
+rate-coded position signal by a three-stage model of theta cells, grid
+cells, and place cells. Hippocampus, 18, 1239-1255.
+
+Blair, H. T., Welday, A. W., & Zhang, K. (2007). Scale-invariant memory
+representations emerge from Moire interference between grid fields that
+produce theta oscillations: A computational model. J Neurosci, 27,
+3211-3229.
+
+Burak, Y., & Fiete, I. R. (2009). Accurate path integration in continuous
+attractor network models of grid cells. PLoS Computational Biology, 5(2).
+
+Burgess, N. (2008). Grid cells and theta as oscillatory interference:
+theory and predictions. Hippocampus, 18(12), 1157-74.
+
+Burgess, N., Barry, C., & O’Keefe, J. (2007). An oscillatory interference
+model of grid cell firing. Hippocampus, 17, 801-812.
+
+Conklin, J., & Eliasmith, C. (2005). A controlled attractor network model
+of path integration in the rat. J Comput Neurosci, 18(2), 183-203.
+
+Fuhs, M. C., & Touretzky, D. S. (2006). A spin glass model of path
+integration in rat medial entorhinal cortex. J Neurosci, 26, 4266-4276.
+
+Gaussier, P., Banquet, J. P., Sargolini, F., Giovannangeli, C., Save, E.,
+& Poucet, B. (2007). A model of grid cells involving extra hippocampal 
+path integration, and the hippocampal loop. J Integrated Neurosci, 6(3),
+447-476.
+
+Giocomo, L. M., Zilli, E. A., Frans´en, E., & Hasselmo, M. E. (2007).
+Temporal frequency of subthreshold oscillations scales with entorhinal
+grid cell field spacing. Science, 23, 1719-1722.
+
+Guanella, A., Kiper, D., & Verschure, P. (2007). A model of grid cells
+based on a twisted torus topology. Int J Neural Syst, 17, 231-240.
+
+Hasselmo, M. E. (2008). Grid cell mechanisms and function: Contributions
+of entorhinal persistent spiking and phase resetting. Hippocampus, 18,
+1213-1229.
+
+Hasselmo, M. E., & Brandon, M. P. (2008). Linking cellular mechanisms to
+behavior: Entorhinal persistent spiking and membrane potential
+oscillations may underlie path integration, grid cell firing and episodic
+memory. Neural Plasticity, 658323.
+
+Kropff, E., & Treves, A. (2008). The emergence of grid cells: Intelligent
+design or just adaptation. Hippocampus, 18(12), 1256-1269.
+
+McNaughton, B. L., Battaglia, F. P., Jensen, O., Moser, E. I., & Moser,
+M. B. (2006). Path integration and the neural basis of the ‘cognitive
+map’. Nat Rev Neurosci, 7, 663-678.
+
+Mhatre, H., Gorchetchnikov, A., & Grossberg, S. (2010). Grid cell
+hexagonal patterns formed by fast self-organized learning within
+entorhinal cortex. Hippocampus, 1098-1063. Available from
+http://dx.doi.org/10.1002/hipo.20901
+
+Navratilova, Z., Giocomo, L. M., Fellous, J.-M., Hasselmo, M. E., &
+McNaughton, B. L. (2011). Phase precession and variable spatial scaling 
+in a periodic attractor map model of medial entorhinal grid cells with 
+realistic after-spike dynamics. Hippocampus, 1098-1063. Available from 
+http://dx.doi.org/10.1002/hipo.20939
+
+O’Keefe, J., & Burgess, N. (2005). Dual phase and rate coding in 
+hippocampal place cells: Theoretical significance and relationship to 
+entorhinal grid cells. Hippocampus, 15, 853-866.
+
+Samsonovich, A., & McNaughton, B. L. (1997). Path integration and 
+cognitive mapping in a continuous attractor neural network model. Journal 
+of Neuroscience, 17(15), 5900-5920.
+
+Welday, A. C., Shlifer, I. G., Bloom, M. L., Zhang, K., & Blair, H. T. 
+(2011). Cosine directional tuning of theta cell burst frequencies: 
+Evidence for spatial coding by oscillatory interference. Journal of 
+Neuroscience, 31(45), 16157-16176. Available from 
+http://www.jneurosci.org/content/31/45/16157.abstract
+
+Zhang, K. (1996). Representation of spatial orientation by the intrinsic 
+dynamics of the head-direction cell ensemble: a theory. Journal of 
+Neuroscience, 16(6), 2112-2126.
+
+Zilli, E. A., & Hasselmo, M. E. (2010). Coupled noisy spiking neurons as 
+velocity-controlled oscillators in a model of grid cell spatial firing. 
+Journal of Neuroscience, 30, 13850-13860.
+
+
+*****************************************
+* Epilogue
+*****************************************
+
+I started as a grad student in September 2003 in Michael Hasselmo's lab,
+which was at the time largely focused on theta rhythm in the hippocampus
+(beginning to move into prefrontal cortex). I therefore started in
+neuroscience by catching up on the experimental and theoretical work done
+on the hippocampus, putting me in a good position to be surprised when
+suddenly grid cells appeared in 2005. That may color my opinions in
+general, as I learned that just when everyone thinks one thing is figured
+out, a completely unexpected aspect of the problem is discovered, so it
+is hard to be too certain about anything!
+
+(Of course, had I known the literature even better, I'd have known repeating
+fields were produced by many earlier models of place cells and perhaps
+would not have found them as surprising!)
+
+I remember first seeing Hafting's 2005 paper in a lab meeting and staying
+after and staring at the hexagonal pattern, trying to figure out how a cell
+could know when the animal had reached positions equally spaced out in a
+hexagonal grid. Afterward I'd spend time thinking about grid cells, as I
+think many people in the field did. Many aspects were quickly clear: the
+repeating code at multiple scales was an efficient way of representing
+positions (or times, as I examined in unpublished work in my PhD thesis,
+though I have since discovered a number of earlier models that did the same),
+but there was no easy way to take a vector of grid activities at a starting
+point and an ending point and calculating the distance or angle, due to the
+repeating nature of the code. They provided an efficient way to mentally
+move through a representation of space (I used grid cells with reinforcement
+learning to solve a task that required mentally navigating space in
+unpublished work following Zilli and Hasselmo 2008, Hippocampus), but that
+doesn't much suggest a mechanism. I did find, though, as many did, that
+Mexican-hat connectivity on an attractor sheet will organize bumps into a
+hexagonal grid. Also, if you screw with the parameters of that network you
+can get some really psychedelic patterns to dance across the cells.
+
+Around 2006 the renowned Lisa Giocomo was recording from stellate cells in
+entorhinal cortex layer II and found a gradient of resonant frequencies
+along the dorsoventral axis of ECII (testing a prediction from O'Keefe and
+Burgess 2005). While she was collecting that data, I tried to
+get a model to produce grid cells and take her data into account. Like
+Kropff and Treves (2008), I made a learning rule (mine resonance-based)
+that allowed a set of grid-cells--to--be to organize weights from
+place cells at hexagonally-arrayed positions so that low resonance frequencies
+would produce larger spacings, as in the data. This model was never
+published because I could never get the thing to actually path integrate
+once these weights were learned. But John White did call my mechanism
+clever, though I suppose that could have been a euphemism!
+
+Before long Burgess and friends had a poster on an oscillatory interference
+grid cell model, and he sent Mike Hasselmo a jpg of their poster, and he
+passed it on to me. I implemented that model as described on the poster
+(which was written in constant-velocity form, so Mike and I subsequently
+had to figure out a good way to write it with a variable velocity).
+
+When Lisa wrote up her ECII resonance data, we included the oscillatory
+interference model in the paper (I'd already given up on my self-organizing
+model) and related her data to that.
+
+I'd finished my PhD thesis at that point (Sept 07) and spent the rest
+of that year and 2008 finishing up some loose ends from my thesis that were
+published as Zilli and Hasselmo (2008a Hippocampus, 2008b PLoS ONE, 2008c
+Frontiers Comput Neurosci), all regarding reinforcement-learning--related
+gridworld tasks with various memory systems.
+
+I returned from gridworld to grid cell world in 2009 by examining a
+common problem identified with interference models: the actual oscillations
+in the brain are considerably more noisy than the noiseless ones used
+in grid cell models up to that time. We looked at this quantitatively
+by analyzing recordings of various neural oscillators and calculated how
+long a grid pattern would remain stable if those oscillations were used.
+Most of the cells would have had stability times on the order of fractions
+of a second, with the best times at perhaps 1.5 s.
+
+These results did not particularly support interference models so, I was
+encouraged not to actually give those low stability times explicitly in the
+abstract because it would look bad for the models. Luckily the message got
+across anyhow, but I regret changing that.
+
+Of course, that data did not doom the interference models, because there
+are many other oscillating fish in the sea, and, in particular, Mike
+thought interactions among oscillators could reduce the effects of noise.
+In Zilli and Hasselmo (2010) we showed that indeed this was true: by
+coupling noisy oscillators, the network as a whole produced more regular
+oscillations than the cells that comprised it. It did appear, however,
+that quite a large number of neurons must be coupled together to get
+the desired high stability times. I expect our results are qualitatively
+true of real neurons, but the quantitative question is harder to answer.
+If I needed 1,000 model neurons in a network to be stable for some
+desired amount of time, it is not clear whether 1,000 real neurons would
+also suffice, or perhaps whether it would be 100 or 10,000. The situation
+could thus be better or worse than it appears.
+
+But it is essentially impossible that any one current model
+is exactly true, and simultaneously most features of the models are too
+generally true of all circuits in the brain for them to be disproven
+(like the way pattern separation and pattern completion are general
+properties of neural networks, yet are specifically attributed to the HC).
+This also has implications for testing the predictions of the models. It
+is an excellent use of the models to guide research by determining
+conflicting predictions of distinct models, but all of the models must
+be understood in the first place to identify the predictions that are
+in fact in conflict.
+
+For example, some may claim that both the resonance gradient of Giocomo
+et al. (2007) and more recent results by ex-local, now SoCal heartthrob
+Mark Brandon et al. (2011; showing inactivation of the medial septum
+disrupts grid cell firing) support the interference models. However, the
+two results are not mutually consistent. Giocomo et al. (2007)'s model was
+specifically modified to not use theta as the baseline oscillation, whereas
+Brandon et al. (2011)'s data was suggested as supporting interference
+models because those models use theta as a baseline. In both cases
+interesting new results were produced by testing predictions of models,
+but those data do not uniquely support any single model or class of
+models.
+
+That brings us to the present, three weeks before Christmas Eve and
+four weeks until 2012: the future! It is worth considering future
+directions for grid cell research.
+
+Common to all the path integration models is the calculation of
+directional velocity inputs. These are worth tracking down. I'd wager
+a good place to look is the cerebellum, since there is a very direct
+path from the otoliths in the inner ear that sense certain kinds of
+motion to the cerebellum (first to the nodus/uvula then to the
+fastigial nucleus) and then right to the medial temporal lobe, and,
+in all likelihood, entorhinal cortex. That cerebellar nucleus seems in
+prime position to provide the body velocity signal needed for the
+models, though I wouldn't be surprised if it were found in
+the thalamus too/instead (see Welday et al. 2011).
+
+Another thing worth examining is whether grid cells always reflect
+the animal's current position. It is reasonable to assume that when
+mentally navigating an environment, the grid cell network could
+be constantly changing to reflect the mental navigation, rather than
+the animal's current position. Similarly, grid cell patterns might
+show the "replay" phenomena reported in place cells (though I don't
+think people do the statistics appropriately on those so I'm not quite
+convinced replay is actually a real thing, even though it does make
+complete sense).
+
+Another question that has not been thoroughly address is, apart from
+edge effects that clearly distort the grid, how globally consistent
+is the hexagonal pattern? Using the spatial power spectral density
+rather than the spatial autocorrelation alone may be a useful tool
+to measure this. Brun et al. (2008) showed rather inconsistent
+spacing on the long linear track, including directional-changes in
+field spacing. Alternatives to perfectly consistent spacing include
+grid fields that are roughly hexagonal but consistently randomized
+in spacing between neighboring fields, roughly hexagonal but in
+non-parallel lines, or "fractured" grids where fields in one half
+of the environment have consistent spacing and similarly in the
+other half, but separated by a "fault line" where the two patterns
+do not agree. These types of patterns can be observed in
+developmental models like Mhatre et al. (2010) or in spatial
+interference models using imperfect patterns like Turing stripes
+(McNaughton et al. 2006).
+
+Similarly, how globally consistent is the crosscorrelation of two
+cells? The independent positional code of linear coding models could
+easily produce inconsistent crosscorrelations, whereas planar coding
+models would predict more consistent patterns of nearby cells.
+Sensory associations that reset grid cells would be expected to
+increase the consistency, so an observation of inconsistency could
+be useful information for understanding how the pattern is generated.
+However, 2D continuous attractor models can transiently sustain flawed 
+patterns, so the crosscorrelation may be best performed on shorter
+time windows.
+
+Other question:
+* Do grid cells fire on every pass through a field? Hafting et al.
+  2005's Figure 6a suggests they may not, at least early in exposure to
+  a novel environment: In the 0-1 minute plot the animal twice passes
+  through two fields on the left edge but the cell does not fire. Is that
+  merely an edge effect?
+* Why do environmental edges distort the grid? And if the regularity
+  of the grid is key to its use as a spatial code, is any spatial
+  ability impaired at edges where this distortion occurs?
+* When a grid cell has a head direction preference, is it always
+  aligned with one of the three directions along which the grid
+  fields line up?
+* Do pentagonal or heptagonal field groupings actually occur or
+  are they artifacts from edge distortions and/or the animal
+  repeatedly taking two distinct trajectories through a field
+  (and so seeming to split one field into two)?
+* Is the amount of phase precession observed within a field correlated
+  with the ratio of field width to field spacing? Temporal interference
+  models predict that firing phase range = 360*(field width)/(field spacing).
+  This phase range applies only to the range where the spikes are
+  truly precessing, not the second component (Yamaguchi et al. 2001)
+  as the animal exits the field where the cell fires across most phases.
+* Do dorsal grid cells develop before ventral grid cells?
+  Experience-dependent learning models might be able to more quickly
+  organize grid cells with smaller field spacing.
+
+If any further information is needed, write to eric dot zilli at
+gmail dot you had better not spam me! dot com.
+ 
+eric zilli - 20111204
